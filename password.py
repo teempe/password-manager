@@ -36,4 +36,3 @@ def generate_password(n_letters=None, n_symbols=None, n_digits=None):
 
 if __name__ == "__main__":
     print(generate_password())
-    print(generate_password(2, 0, -1))
