@@ -35,6 +35,19 @@ def save_data():
         messagebox.showerror("Error", "Please fill all fields.")
 
 
+def find_data():
+    service = site_entry.get()
+    username_entry.delete(0, END)
+    password_entry.delete(0, END)
+    
+    results = repository.find_service(service)
+    if results is None:
+        messagebox.showerror("Error", f"No details of the {service} or no data file found.")
+    else:
+        username_entry.insert(0, results[1])
+        password_entry.insert(0, results[2])
+
+
 def get_password():
     new_password = password.generate_password()
     password_entry.insert(0, new_password)
@@ -61,7 +74,7 @@ password_label = Label(root, text="Password:", bg=WINDOW_BG)
 password_label.grid(row=3, column=0, padx=5, pady=5)
 
 # Entries
-site_entry = Entry(root, width=45)
+site_entry = Entry(root, width=25)
 site_entry.focus()
 site_entry.grid(row=1, column=1, columnspan=2, sticky=W)
 
@@ -72,6 +85,9 @@ password_entry = Entry(root, width=25)
 password_entry.grid(row=3, column=1, sticky=W)
 
 # Buttons
+search_btn = Button(root, text="Search", bg=BUTTON_BG, width=16, command=find_data)
+search_btn.grid(row=1, column=2)
+
 gen_btn = Button(root, text="Generate Password", bg=BUTTON_BG, command=get_password)
 gen_btn.grid(row=3, column=2)
 
