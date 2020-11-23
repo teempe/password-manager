@@ -2,7 +2,7 @@ import string
 import random
 
 
-def generate_password(n_letters=0, n_symbols=0, n_digits=0):
+def generate_password(n_letters=None, n_symbols=None, n_digits=None):
     """
     Generates random password.
     Function takes required numbers of letters, symbols and digits and generates random passowrd.
@@ -17,9 +17,9 @@ def generate_password(n_letters=0, n_symbols=0, n_digits=0):
         str: Generated password
     """
 
-    n_letters = random.randint(8, 10) if n_letters == 0 else n_letters
-    n_symbols = random.randint(2, 4) if n_symbols == 0 else n_symbols
-    n_digits = random.randint(2, 4) if n_digits == 0 else n_digits
+    n_letters = random.randint(8, 10) if n_letters is None else n_letters
+    n_symbols = random.randint(2, 4) if n_symbols is None else n_symbols
+    n_digits = random.randint(2, 4) if n_digits is None else n_digits
 
     symbols=["!", "#", "$", "%", "&", "(", ")", "*", "+"]
     password = []
@@ -36,3 +36,4 @@ def generate_password(n_letters=0, n_symbols=0, n_digits=0):
 
 if __name__ == "__main__":
     print(generate_password())
+    print(generate_password(2, 0, -1))
