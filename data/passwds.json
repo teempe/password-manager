@@ -1,14 +1,14 @@
 {
-    "Instagram": {
-        "username": "User",
-        "password": "0dz5S7Lt%3xH)h"
+    "facebook": {
+        "username": "FBUser",
+        "password": "MgH2NvEr28a$0W+"
     },
-    "Facebook": {
-        "username": "User",
-        "password": "c)adqXn0l&IM&R7"
+    "instagram": {
+        "username": "InstaUser",
+        "password": "7(FH++XXEv7h5P5"
     },
-    "Twitter": {
-        "username": "User",
-        "password": "U!Y5Y72#B)e(zEa4b"
+    "twitter": {
+        "username": "TwitUser",
+        "password": "0Mn%Q(5)DWiix7&"
     }
 }
