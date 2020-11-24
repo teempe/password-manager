@@ -1,60 +1,120 @@
 import json
 
 
-DATA_FILE_PATH = "data/passwds.json"
-
-
-def read_json(filepath=DATA_FILE_PATH):
-    with open(filepath, "r") as data_file:
-        data = json.load(data_file)
-    return data    
-
-
-def write_json(data, filepath=DATA_FILE_PATH):
-    with open(filepath, "w") as data_file:
-        json.dump(data, data_file, indent=4) 
-
-
-def find_service(service_name):
+class JsonRepository:
     """
-    Finds username and password for given service. If not found file or data returns None.
+    Provides CRUD operations on json storage file.
 
-    Paramaters:
-        service_name (str): Service name to look for
+    Attributes:
+        filepath (str): path to json file
 
-    Returns:
-        tuple: (service, username, password) or None when nothing found
+    Methods:
+        save(service, username, password) -> None
+        find(service) -> tuple
+        update(service, username, password) -> None
+        delete(service) -> boolean
     """
+
+    def __init__(self, filepath="data/passwds.json"):
+        """
+        Constructs attributes for JsonRepository object.
+
+        Parameters:
+            filepath (str): path to json file
+        """
+
+        self.filepath = filepath
+
+    def _write_json(self, data):
+        with open(self.filepath, "w") as data_file:
+            json.dump(data, data_file, indent=4)
+
+    def _read_json(self):
+        try:
+            with open(self.filepath, "r") as data_file:
+                data = json.load(data_file)
+        except FileNotFoundError:
+            return None
+        else:
+            return data
+
+    def save(self, service, username, password):
+        """
+        Saves data into json file or update if service already exists.
+
+        Parameters:
+            service (str): service/website name
+            username (str): username/login
+            password (str): password
+        
+        Returns:
+            None
+        """
+
+        service = service.lower()
+        entry = {service: 
+            {"username":username, "password":password}
+        }
+
+        data = self._read_json()
+        if data is None:
+            self._write_json(entry)
+        else:
+            data.update(entry)
+            self._write_json(data)
+
+    def find(self, service):
+        """
+        Get data from json file for given service name if exists.
+        Return tuple with data or None if nothing found.
+
+        Parameters:
+            service (str): service/website name to seach
+        
+        Returns:
+            tuple
+        """
+
+        service = service.lower()
+        data = self._read_json()
+        if (data is None) or (service not in data):
+            return None
+
+        entry = data[service]
+        return (service, entry["username"], entry["password"])
     
-    try:
-        data = read_json()
-    except FileNotFoundError:
-        return None
+    def update(self, service, username, password):
+        """
+        Updates username and password for given service name if exists.
 
-    data_found = data.get(service_name, None)
-    if data_found is not None:
-        return (service_name, data_found["username"], data_found["password"])
-    else:
-        return None
+        Parameters:
+            service (str): service/website name
+            username (str): username/login
+            password (str): password
 
+        Returns:
+            None
+        """
 
-def save(service, username, password):
-    """Save data to json file."""
+        self.save(service, username, password)
 
-    entry = {service : {
-        "username": username,
-        "password": password
-    }}
+    def delete(self, service):
+        """
+        Deletes data for given service name if exists.
+        Returns True if operation succeded or False otherwise.
 
-    try:
-        data = read_json()
-    except FileNotFoundError:
-        write_json(entry)
-    else:
-        data.update(entry)
-        write_json(data)
+        Parameters:
+            service (str): service/website name
 
+        Returns:
+            None
+        """
 
-if __name__ == "__main__":
-    print(find_service("Facebook"))
-    print(find_service("StackOverflow"))
+        service = service.lower()
+        data = self._read_json()
+        if (data is None) or (service not in data):
+            return False
+
+        del data[service]
+        self._write_json(data)
+        return True     
