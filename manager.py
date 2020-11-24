@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import messagebox
-import repository
+from repository import JsonRepository
 import password
 
 
@@ -14,7 +14,7 @@ def is_entry_valid(service, username, password):
     return True
 
 
-def clear_entries():
+def clear_all_entries():
     site_entry.delete(0, END)
     username_entry.delete(0, END)
     password_entry.delete(0, END)
@@ -26,32 +26,47 @@ def save_data():
     password = password_entry.get()
 
     if is_entry_valid(service, user, password):
-        answer = messagebox.askyesno(service, f"User: {user}\nPassword: {password}\nIs it OK to save?")
-        if answer:
-            repository.save(service, user, password)
-            clear_entries()
-            messagebox.showinfo("Success", "Data have been saved.")
+        storage.save(service, user, password)
+        clear_all_entries()
+        messagebox.showinfo("Success!", "Data have been saved.")
     else:
-        messagebox.showerror("Error", "Please fill all fields.")
+        messagebox.showerror("Error!", "Please fill all fields.")
+    del_btn.config(state=DISABLED)
 
 
 def find_data():
     service = site_entry.get()
+    if service == "":
+        messagebox.showerror("Error!", "Please fill search field.")
+        return
+
     username_entry.delete(0, END)
     password_entry.delete(0, END)
-    
-    results = repository.find_service(service)
+
+    results = storage.find(service)
     if results is None:
         messagebox.showerror("Error", f"No details of the {service} or no data file found.")
     else:
         username_entry.insert(0, results[1])
         password_entry.insert(0, results[2])
+        del_btn.config(state=ACTIVE)
+
+
+def delete_data():
+    service = site_entry.get()
+    if storage.delete(service):
+        clear_all_entries()
+        messagebox.showinfo("Success!", f"All data for {service} have been deleted.")
+    else:
+        messagebox.showerror("Error", f"No details of the {service} or no data file found.")
+    del_btn.config(state=DISABLED)
 
 
 def get_password():
     new_password = password.generate_password()
     password_entry.insert(0, new_password)
 
+storage = JsonRepository()
 
 root = Tk()
 root.title("Password Manager")
@@ -76,7 +91,7 @@ password_label.grid(row=3, column=0, padx=5, pady=5)
 # Entries
 site_entry = Entry(root, width=25)
 site_entry.focus()
-site_entry.grid(row=1, column=1, columnspan=2, sticky=W)
+site_entry.grid(row=1, column=1, sticky=W)
 
 username_entry = Entry(root, width=45)
 username_entry.grid(row=2, column=1, columnspan=2, sticky=W)
@@ -91,7 +106,10 @@ search_btn.grid(row=1, column=2)
 gen_btn = Button(root, text="Generate Password", bg=BUTTON_BG, command=get_password)
 gen_btn.grid(row=3, column=2)
 
-add_btn = Button(root, text="Add", width=42, bg=BUTTON_BG, command=save_data)
+add_btn = Button(root, text="Add / Update", width=42, bg=BUTTON_BG, command=save_data)
 add_btn.grid(row=4, column=1, columnspan=2, pady=5)
+
+del_btn = Button(root, text="Delete", width=42, bg=BUTTON_BG, state=DISABLED, command=delete_data)
+del_btn.grid(row=5, column=1, columnspan=2, pady=5)
 
 root.mainloop()
